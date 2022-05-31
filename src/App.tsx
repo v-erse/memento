@@ -7,8 +7,14 @@ import {
   useGLTF,
   useMask,
 } from "@react-three/drei";
-import { Suspense, useRef } from "react";
-import { DebugLayerMaterial, Depth, Fresnel, LayerMaterial } from "lamina";
+import { Suspense, useLayoutEffect, useRef } from "react";
+import {
+  DebugLayerMaterial,
+  Depth,
+  Fresnel,
+  LayerMaterial,
+  Noise,
+} from "lamina";
 import { BufferGeometry, Material, Mesh } from "three";
 import * as THREE from "three";
 
@@ -16,7 +22,7 @@ function SkullMat() {
   const ref = useRef<any>();
 
   return (
-    <DebugLayerMaterial
+    <LayerMaterial
       ref={ref}
       transmission={1}
       roughness={0.7}
@@ -53,7 +59,7 @@ function SkullMat() {
         factor={1.5299999999999996}
         mode={"add"}
       />
-    </DebugLayerMaterial>
+    </LayerMaterial>
   );
 }
 
@@ -96,14 +102,32 @@ function Memento() {
 
   const t = useThree();
 
-  useFrame(() => {
-    if (textRef.current) textRef.current.lookAt(t.camera.position);
-  });
+  useLayoutEffect(() => {
+    const size = new THREE.Vector3();
+    if (textRef.current) {
+      textRef.current.geometry.computeBoundingBox();
+      textRef.current.geometry.boundingBox!.getSize(size);
+      textRef.current.position.x = -size.x / 2;
+    }
+  }, [textRef.current]);
 
   return (
-    <Text3D ref={textRef} position={[-4.5, 0, -4]} font="/Inter_Regular.json">
-      <LayerMaterial {...stencil}></LayerMaterial>
-      {`Memento Mori`}
+    <Text3D
+      ref={textRef}
+      position={[0, -0.5, -4]}
+      height={0.1}
+      size={1.2}
+      font="/Pirata One_Regular.json"
+    >
+      {/* <LayerMaterial {...stencil}></LayerMaterial> */}
+      <LayerMaterial
+        color={"#fff"}
+        lighting={"physical"}
+        envMapIntensity={0.3}
+        // transmission={0.9}
+        {...stencil}
+      ></LayerMaterial>
+      {`memento mori`}
     </Text3D>
   );
 }
@@ -113,12 +137,20 @@ export default function App() {
     <Canvas orthographic camera={{ zoom: 200 }}>
       <OrbitControls makeDefault />
       <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} />
+      <pointLight position={[100, 10, 10]} />
       <Environment preset="city" />
       <Suspense fallback={null}>
         <Skull />
         <Memento />
       </Suspense>
+      {/* <DepthOfField
+          focusDistance={0}
+          focalLength={0.02}
+          bokehScale={2}
+          height={480}
+        />
+        <Noise opacity={0.02} />
+        <Vignette eskil={false} offset={0.1} darkness={1.1} /> */}
     </Canvas>
   );
 }
