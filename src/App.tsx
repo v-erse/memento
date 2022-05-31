@@ -1,4 +1,4 @@
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import {
   Environment,
   Mask,
@@ -7,7 +7,7 @@ import {
   useGLTF,
   useMask,
 } from "@react-three/drei";
-import { Suspense, useLayoutEffect, useRef } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import {
   DebugLayerMaterial,
   Depth,
@@ -102,7 +102,7 @@ function Memento() {
 
   const t = useThree();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const size = new THREE.Vector3();
     if (textRef.current) {
       textRef.current.geometry.computeBoundingBox();
