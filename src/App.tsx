@@ -1,4 +1,4 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Environment,
   Mask,
@@ -9,30 +9,51 @@ import {
 } from "@react-three/drei";
 import { Suspense, useRef } from "react";
 import { DebugLayerMaterial, Depth, Fresnel, LayerMaterial } from "lamina";
+import { BufferGeometry, Material, Mesh } from "three";
+import * as THREE from "three";
 
 function SkullMat() {
   const ref = useRef<any>();
 
   return (
-    <LayerMaterial
+    <DebugLayerMaterial
       ref={ref}
       transmission={1}
-      roughness={0.9}
+      roughness={0.7}
       thickness={2}
       lighting={"physical"}
-      clearcoat={0.2}
-      clearcoatRoughness={0.2}
+      clearcoat={0.4}
+      clearcoatRoughness={0}
       ior={1.01}
-      envMapIntensity={2}
+      envMapIntensity={0.5}
+      side={THREE.FrontSide}
+      depthTest
+      depthWrite
     >
-      <Fresnel
-        color={"#fe0000"}
-        bias={1}
-        intensity={0.8}
-        power={1}
-        mode={"darken"}
+      <Depth
+        near={3.92}
+        far={0.5}
+        origin={[0, 0, 0]}
+        colorA={"#fe0000"}
+        colorB={"#000000"}
       />
-    </LayerMaterial>
+      <Depth
+        near={3.92}
+        far={0.5}
+        origin={[0, 0, 0]}
+        colorA={"#fe0000"}
+        colorB={"#000000"}
+      />
+      <Fresnel
+        color={"#fed0d0"}
+        alpha={0.15000000000000002}
+        bias={0.05000000000000079}
+        intensity={0.2}
+        power={5}
+        factor={1.5299999999999996}
+        mode={"add"}
+      />
+    </DebugLayerMaterial>
   );
 }
 
@@ -69,9 +90,25 @@ function Skull({ ...props }) {
   );
 }
 
-export default function App() {
+function Memento() {
   const stencil = useMask(1);
+  const textRef = useRef<Mesh<BufferGeometry, Material | Material[]>>(null);
 
+  const t = useThree();
+
+  useFrame(() => {
+    if (textRef.current) textRef.current.lookAt(t.camera.position);
+  });
+
+  return (
+    <Text3D ref={textRef} position={[-4.5, 0, -4]} font="/Inter_Regular.json">
+      <LayerMaterial {...stencil}></LayerMaterial>
+      {`Memento Mori`}
+    </Text3D>
+  );
+}
+
+export default function App() {
   return (
     <Canvas orthographic camera={{ zoom: 200 }}>
       <OrbitControls makeDefault />
@@ -80,13 +117,7 @@ export default function App() {
       <Environment preset="city" />
       <Suspense fallback={null}>
         <Skull />
-
-        <Text3D position={[-4.5, 0, -4]} font="/Inter_Regular.json">
-          <DebugLayerMaterial {...stencil}>
-            <Depth />
-          </DebugLayerMaterial>
-          {`Memento Mori`}
-        </Text3D>
+        <Memento />
       </Suspense>
     </Canvas>
   );
