@@ -18,6 +18,12 @@ import {
 import { BufferGeometry, Material, Mesh } from "three";
 import * as THREE from "three";
 
+/**
+ * brighten text
+ * add blue light
+ * glow shader?
+ */
+
 function SkullMat() {
   const ref = useRef<any>();
 
@@ -43,16 +49,20 @@ function SkullMat() {
         colorA={"#fe0000"}
         colorB={"#000000"}
       />
+
       <Depth
-        near={3.92}
-        far={0.5}
+        near={0.9}
+        far={0.639}
         origin={[0, 0, 0]}
         colorA={"#fe0000"}
         colorB={"#000000"}
+        alpha={0.12}
+        mode={"add"}
       />
+
       <Fresnel
-        color={"#fed0d0"}
-        alpha={0.15000000000000002}
+        color={"#00ccfe"}
+        alpha={0.14}
         bias={0.05000000000000079}
         intensity={0.2}
         power={5}
@@ -116,7 +126,7 @@ function Memento() {
       ref={textRef}
       position={[0, -0.5, -4]}
       height={0.1}
-      size={1.2}
+      size={1.4}
       font="/Pirata One_Regular.json"
     >
       {/* <LayerMaterial {...stencil}></LayerMaterial> */}
@@ -136,8 +146,9 @@ export default function App() {
   return (
     <Canvas orthographic camera={{ zoom: 200 }}>
       <OrbitControls makeDefault />
-      <ambientLight intensity={0.5} />
-      <pointLight position={[100, 10, 10]} />
+      <ambientLight intensity={0.5} color="blue" />
+      <pointLight position={[10, 10, 10]} />
+      <pointLight position={[0, 10, 10]} color="blue" />
       <Environment preset="city" />
       <Suspense fallback={null}>
         <Skull />
