@@ -8,28 +8,17 @@ import {
   useMask,
 } from "@react-three/drei";
 import { Suspense, useEffect, useRef } from "react";
-import {
-  DebugLayerMaterial,
-  Depth,
-  Fresnel,
-  LayerMaterial,
-  Noise,
-} from "lamina";
+import { Depth, Fresnel, LayerMaterial } from "lamina";
 import { BufferGeometry, Material, Mesh } from "three";
 import * as THREE from "three";
 
 /**
- * brighten text
- * add blue light
  * glow shader?
  */
 
 function SkullMat() {
-  const ref = useRef<any>();
-
   return (
     <LayerMaterial
-      ref={ref}
       transmission={1}
       roughness={0.7}
       thickness={2}
@@ -41,6 +30,8 @@ function SkullMat() {
       side={THREE.FrontSide}
       depthTest
       depthWrite
+      emissive="blue"
+      emissiveIntensity={0.01}
     >
       <Depth
         near={3.92}
@@ -110,8 +101,6 @@ function Memento() {
   const stencil = useMask(1);
   const textRef = useRef<Mesh<BufferGeometry, Material | Material[]>>(null);
 
-  const t = useThree();
-
   useEffect(() => {
     const size = new THREE.Vector3();
     if (textRef.current) {
@@ -154,14 +143,6 @@ export default function App() {
         <Skull />
         <Memento />
       </Suspense>
-      {/* <DepthOfField
-          focusDistance={0}
-          focalLength={0.02}
-          bokehScale={2}
-          height={480}
-        />
-        <Noise opacity={0.02} />
-        <Vignette eskil={false} offset={0.1} darkness={1.1} /> */}
     </Canvas>
   );
 }
